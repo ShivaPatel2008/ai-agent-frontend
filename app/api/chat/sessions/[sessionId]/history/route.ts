@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const BACKEND_API_URL =
   process.env.BACKEND_API_URL ||
-  "https://ai-therapist-agent-backend.onrender.com";
+  "https://ai-agent-backend-em2x.onrender.com";
 
 export async function GET(
   req: NextRequest,
@@ -35,11 +35,18 @@ export async function GET(
     console.log("Chat history retrieved successfully:", data);
 
     // Format the response to match the frontend's expected format
-    const formattedMessages = data.map((msg: any) => ({
-      role: msg.role,
-      content: msg.content,
-      timestamp: msg.timestamp,
-    }));
+    interface ChatMessage {
+    role: "user" | "assistant";
+    message: string;
+    timestamp: string | Date;
+  }
+
+  const formattedMessages = data.map((msg: ChatMessage) => ({
+    role: msg.role,
+    content: msg.message, // or msg.content, depending on backend
+    timestamp: msg.timestamp,
+  }));
+
 
     return NextResponse.json(formattedMessages);
   } catch (error) {
