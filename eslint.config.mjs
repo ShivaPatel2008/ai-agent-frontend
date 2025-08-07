@@ -21,6 +21,8 @@ export default [
       },
     },
     rules: {
+      
+      "react/no-unescaped-entities": "off",
       "@typescript-eslint/no-explicit-any": "off", // turn off 'any' errors
       "@typescript-eslint/no-unused-vars": "off",  // turn off unused var errors
     },

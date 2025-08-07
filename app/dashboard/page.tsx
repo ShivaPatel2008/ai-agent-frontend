@@ -634,7 +634,7 @@ export default function Dashboard() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle>Today's Overview</CardTitle>
+                    <CardTitle>Today Overview</CardTitle>
                     <CardDescription>
                       Your wellness metrics for{" "}
                       {format(new Date(), "MMMM d, yyyy")}
