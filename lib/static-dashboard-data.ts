@@ -1,5 +1,15 @@
-// Static data for the dashboard
-const staticChatHistory = [
+// Define ChatMessage type for consistent use
+interface ChatMessage {
+  id: string;
+  userId: string;
+  message: string;
+  role: "user" | "assistant";
+  timestamp: Date;
+  sentiment: string;
+  context: null; // You can later change this to `ChatContext | null`
+}
+
+const staticChatHistory: ChatMessage[] = [
   {
     id: "1",
     userId: "user1",
@@ -82,6 +92,8 @@ const staticActivities = [
   },
 ];
 
+// Exported APIs
+
 export const getSessionChatHistory = async (sessionId: string) => {
   return staticChatHistory;
 };
@@ -90,16 +102,16 @@ export const saveChatMessage = async (data: {
   userId: string;
   message: string;
   role: "user" | "assistant";
-  context?: any;
-}) => {
-  const newMessage = {
+  context?: null;
+}): Promise<ChatMessage> => {
+  const newMessage: ChatMessage = {
     id: Math.random().toString(36).substr(2, 9),
     userId: data.userId,
     message: data.message,
     role: data.role,
     timestamp: new Date(),
     sentiment: "neutral",
-    context: data.context,
+    context: data.context ?? null,
   };
   staticChatHistory.push(newMessage);
   return newMessage;
