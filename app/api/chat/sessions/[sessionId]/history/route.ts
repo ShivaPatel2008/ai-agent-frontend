@@ -1,8 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import type { NextApiResponse } from "next";
-
-// Import type for the context
-import type { NextFetchEvent } from "next/server";
 
 const BACKEND_API_URL =
   process.env.BACKEND_API_URL ||
@@ -10,10 +6,10 @@ const BACKEND_API_URL =
 
 export async function GET(
   req: NextRequest,
-  context: { params: { sessionId: string } }
+  { params }: { params: { sessionId: string } }
 ) {
   try {
-    const { sessionId } = context.params;
+    const { sessionId } = params;
     console.log(`Getting chat history for session ${sessionId}`);
 
     const response = await fetch(
