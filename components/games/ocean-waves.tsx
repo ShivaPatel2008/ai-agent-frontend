@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, useAnimation } from "framer-motion";
 import { Waves, Volume2, VolumeX, Play, Pause } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,9 +16,13 @@ export function OceanWaves() {
   const [progress, setProgress] = useState(0);
   const [timeLeft, setTimeLeft] = useState(SESSION_DURATION);
   const waveControls = useAnimation();
-  const [audio] = useState(new Audio("/sounds/waves.mp3"));
 
+  // Use useRef to keep a stable audio instance
+  const audioRef = useRef(new Audio("/sounds/waves.mp3"));
+
+  // On mount, setup audio loop and cleanup on unmount
   useEffect(() => {
+    const audio = audioRef.current;
     audio.loop = true;
     audio.volume = volume / 100;
 
@@ -26,12 +30,14 @@ export function OceanWaves() {
       audio.pause();
       audio.currentTime = 0;
     };
-  }, []);
+  }, [volume]); // no dependencies, runs once
 
+  // Update volume when volume changes
   useEffect(() => {
-    audio.volume = volume / 100;
+    audioRef.current.volume = volume / 100;
   }, [volume]);
 
+  // Handle timer and animation
   useEffect(() => {
     let timer: NodeJS.Timeout;
 
@@ -44,7 +50,6 @@ export function OceanWaves() {
         });
       }, 1000);
 
-      // Animate waves
       waveControls.start({
         y: [0, -20, 0],
         transition: {
@@ -58,9 +63,10 @@ export function OceanWaves() {
     }
 
     return () => clearInterval(timer);
-  }, [isPlaying, timeLeft]);
+  }, [isPlaying, timeLeft, waveControls]); // include waveControls
 
   const togglePlay = () => {
+    const audio = audioRef.current;
     if (isPlaying) {
       audio.pause();
     } else {

@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import { staticSessions } from "@/lib/static-data";
@@ -43,14 +43,8 @@ export function SessionHistory({ onNewSession }: SessionHistoryProps) {
     setMounted(true);
   }, []);
 
-  // Load sessions when component mounts
-  useEffect(() => {
-    if (mounted) {
-      loadSessions();
-    }
-  }, [mounted]);
-
-  const loadSessions = async () => {
+  // Memoized loadSessions with useCallback
+  const loadSessions = useCallback(async () => {
     try {
       setIsLoading(true);
       // Use static data instead of database call
@@ -67,7 +61,14 @@ export function SessionHistory({ onNewSession }: SessionHistoryProps) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [params.sessionId]);
+
+  // Load sessions when component mounts (and mounted state changes)
+  useEffect(() => {
+    if (mounted) {
+      loadSessions();
+    }
+  }, [mounted, loadSessions]);
 
   const handleNewSession = async () => {
     try {
@@ -325,7 +326,7 @@ function EmptyState({ searchQuery }: { searchQuery: string }) {
   return (
     <div className="text-center py-8 text-muted-foreground">
       {searchQuery ? (
-        <p>No sessions found matching "{searchQuery}"</p>
+        <p>No sessions found matching {searchQuery}</p>
       ) : (
         <>
           <p>No sessions yet</p>

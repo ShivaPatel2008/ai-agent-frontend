@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { TreePine, Volume2, VolumeX, Play, Pause } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,33 +14,34 @@ export function ForestGame() {
   const [volume, setVolume] = useState(50);
   const [progress, setProgress] = useState(0);
   const [timeLeft, setTimeLeft] = useState(MEDITATION_DURATION);
-  const [audioElements] = useState({
+
+  // Memoize the audio elements so they don't change on re-render
+  const audioElements = useMemo(() => ({
     birds: new Audio("/sounds/birds.mp3"),
     wind: new Audio("/sounds/wind.mp3"),
     leaves: new Audio("/sounds/leaves.mp3"),
-  });
+  }), []);
 
   useEffect(() => {
-    // Set up audio loops
     Object.values(audioElements).forEach((audio) => {
       audio.loop = true;
-      audio.volume = volume / 100;
     });
 
     return () => {
-      // Cleanup audio on unmount
       Object.values(audioElements).forEach((audio) => {
         audio.pause();
         audio.currentTime = 0;
       });
     };
-  }, []);
+  }, [audioElements]);
+
 
   useEffect(() => {
+    // Update volume when it changes
     Object.values(audioElements).forEach((audio) => {
       audio.volume = volume / 100;
     });
-  }, [volume]);
+  }, [volume, audioElements]);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -98,6 +99,7 @@ export function ForestGame() {
       </div>
 
       <div className="w-64 space-y-6">
+        {/* Volume Slider */}
         <div className="space-y-2">
           <div className="flex justify-between text-sm text-muted-foreground">
             <span>Volume</span>
@@ -118,8 +120,10 @@ export function ForestGame() {
           </div>
         </div>
 
+        {/* Progress Bar */}
         <Progress value={progress} className="h-2" />
 
+        {/* Timer and Play/Pause */}
         <div className="flex items-center justify-between">
           <span className="text-sm text-muted-foreground">
             {formatTime(timeLeft)}
